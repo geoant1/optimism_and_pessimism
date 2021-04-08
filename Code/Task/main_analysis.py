@@ -2,7 +2,7 @@ import numpy as np
 import os, glob
 import scipy.stats
 import matplotlib.pyplot as plt
-from misc_analysis import get_optimal_move, get_entropy, get_joint_entropy, get_Q_true, histogram, permutation_test, policy_improve_2moves, policy_improve, get_sorted_files, get_obtained_reward, analyse_recent_replays, analyse_other_replays, get_replay_benefit
+from misc_analysis import get_optimal_move, get_entropy, get_joint_entropy, get_Q_true, histogram, permutation_test, policy_improve_2moves, policy_improve, get_obtained_reward, analyse_recent_replays, analyse_other_replays, get_replay_benefit
 from plot import plot_performance, plot_replays_entropy, plot_replays, plot_policy
 
 root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/'
