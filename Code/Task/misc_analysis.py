@@ -5,10 +5,10 @@ from misc import policy_choose, policy_choose_moves, get_new_state, state2idcs, 
 root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/'
 
 # Worlds & idcs
-world1 = np.load(os.path.join(root_path, 'Data/Eran/world1.npy'))
-world2 = np.load(os.path.join(root_path, 'Data/Eran/world2.npy'))
-idcs1  = np.load(os.path.join(root_path, 'Data/Eran/idcs1.npy'))
-idcs2  = np.load(os.path.join(root_path, 'Data/Eran/idcs2.npy'))
+world1 = np.load(os.path.join(root_path, 'Data/world1.npy'))
+world2 = np.load(os.path.join(root_path, 'Data/world2.npy'))
+idcs1  = np.load(os.path.join(root_path, 'Data/idcs1.npy'))
+idcs2  = np.load(os.path.join(root_path, 'Data/idcs2.npy'))
 
 def get_sorted_files(path):
     

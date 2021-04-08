@@ -7,16 +7,16 @@ from agent import Agent
 root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/'
 
 # Worlds & idcs
-world1 = np.load(os.path.join(root_path, 'Data/Eran/world1.npy'))
-world2 = np.load(os.path.join(root_path, 'Data/Eran/world2.npy'))
-idcs1  = np.load(os.path.join(root_path, 'Data/Eran/idcs1.npy'))
-idcs2  = np.load(os.path.join(root_path, 'Data/Eran/idcs2.npy'))
+world1 = np.load(os.path.join(root_path, 'Data/world1.npy'))
+world2 = np.load(os.path.join(root_path, 'Data/world2.npy'))
+idcs1  = np.load(os.path.join(root_path, 'Data/idcs1.npy'))
+idcs2  = np.load(os.path.join(root_path, 'Data/idcs2.npy'))
 
-data_path = os.path.join(root_path, 'Data/Eran/subject_data')
+data_path = os.path.join(root_path, 'Data/subject_data')
 
 ZERO_MF         = False
-# subs_who_replay = np.load(os.path.join(root_path, 'Data/Eran/task/Analysis/subs_who_replay.npy'))
-path_to_save    = os.path.join(root_path, 'Data/Eran/task_recov')
+# subs_who_replay = np.load(os.path.join(root_path, 'Data/task/Analysis/subs_who_replay.npy'))
+path_to_save    = os.path.join(root_path, 'Data/task_recov')
 
 # Load data
 for sub in [0]:
@@ -26,7 +26,7 @@ for sub in [0]:
     save_path      = os.path.join(path_to_save, str(sub))
 
     # Initialise the agent
-    p_arr = np.load(os.path.join(root_path, 'Data/Eran/fits_recov/save_params_%u/%u/params.npy'%(sub, 1)))    
+    p_arr = np.load(os.path.join(root_path, 'Data/fits_recov/save_params_%u/%u/params.npy'%(sub, 1)))    
     p     = convert_params(p_arr)
 
     a = Agent(**p)

@@ -8,10 +8,10 @@ from plot import plot_performance, plot_replays_entropy, plot_replays, plot_poli
 root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/'
 
 # Worlds & idcs
-world1 = np.load(os.path.join(root_path, 'Data/Eran/world1.npy'))
-world2 = np.load(os.path.join(root_path, 'Data/Eran/world2.npy'))
-idcs1  = np.load(os.path.join(root_path, 'Data/Eran/idcs1.npy'))
-idcs2  = np.load(os.path.join(root_path, 'Data/Eran/idcs2.npy'))
+world1 = np.load(os.path.join(root_path, 'Data/world1.npy'))
+world2 = np.load(os.path.join(root_path, 'Data/world2.npy'))
+idcs1  = np.load(os.path.join(root_path, 'Data/idcs1.npy'))
+idcs2  = np.load(os.path.join(root_path, 'Data/idcs2.npy'))
 
 def analyse_task_performance(task_folder):
     
@@ -28,7 +28,7 @@ def analyse_task_performance(task_folder):
     ### Analyse task performance ###
     ### ------------------------ ###
 
-    path        = os.path.join(root_path, 'Data/Eran/subject_data')
+    path        = os.path.join(root_path, 'Data/subject_data')
 
     perf_agent  = np.zeros((nsubs, 15))
     perf_human  = np.zeros((nsubs, 15))
@@ -267,7 +267,7 @@ def analyse_replay_benefit(task_folder):
     ### ------------------------- ###
     
     analysis_folder = os.path.join(task_folder, 'Analysis')
-    subs_who_replay = np.load(os.path.join(root_path, 'Data/Eran/task/Analysis/subs_who_replay.npy'))
+    subs_who_replay = np.load(os.path.join(root_path, 'Data/task/Analysis/subs_who_replay.npy'))
     print('Analysing benefit of replay...\n')
 
     modes   = ['value', 'probs', 'value']
@@ -283,7 +283,7 @@ def analyse_replay_benefit(task_folder):
         for sub in subs_who_replay:
             
             sub_task_folder = os.path.join(task_folder, str(sub))
-            params = os.path.join(root_path, 'Data/Eran/fits/save_params_%u/params.npy'%sub)            
+            params = os.path.join(root_path, 'Data/fits/save_params_%u/params.npy'%sub)            
             p      = np.load(params)
             
             opt_sub = get_replay_benefit(sub_task_folder, p, modes[mode], ben)
@@ -315,7 +315,7 @@ def analyse_replay_benefit(task_folder):
             f.write('\n Average: %.3f'%np.nanmean(opt_all))
             f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_all, 0))
             
-this_folder = os.path.join(root_path, 'Data/Eran/task')
+this_folder = os.path.join(root_path, 'Data/task')
 analyse_task_performance(this_folder)
 analyse_replay_statistics(this_folder, 0.5)
 analyse_replay_benefit(this_folder)
