@@ -47,6 +47,8 @@ class Agent:
         # Buffers for rewards experienced by the agent
         self.rew_history2 = []
         self.rew_history1 = []
+        
+        self.ratio = []
                 
         return
     
@@ -71,6 +73,8 @@ class Agent:
             s = np.random.randint(self.num_states)
 
         si = state2idcs(s, state_arr)
+        
+        _, Q_true = get_Q_true(world, state_arr)
         
         # Start exploring the maze
         for trial in range(self.num_trials):
@@ -128,8 +132,9 @@ class Agent:
             
             if replay:
 
-                self.Q2 = replay_1move(self.Q2.copy(), self.T2, world, self.beta2, self.alpha2, self.evm_thresh)
-            
+                self.Q2, ratio = replay_1move(self.Q2.copy(), self.T2, world, Q_true, self.beta2, self.alpha2, self.evm_thresh)
+                self.ratio += [ratio]
+                
             if save_folder is not None:
                 save_name = os.path.join(save_folder, 'move%u'%trial)
                 np.savez(save_name, move=[s, a, r, s1], T=self.T2, replay_gain=replay_gain, 
@@ -153,7 +158,7 @@ class Agent:
                         self.T2[i, j, :] = row / tmp
                                  
             if trial == (self.num_trials-1):
-                return np.array(self.rew_history2)
+                return np.array(self.rew_history2), np.array(self.ratio)
                         
             # Complete this step – prepare next trial
             if states is not None:

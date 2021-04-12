@@ -45,8 +45,45 @@ def get_new_state(si, a, world, states):
     
     return s1i, r
 
+def get_optimal_move(s, Q_true, a=None):
+    
+    if a is None:
+        a_opt  = np.argwhere(Q_true[s, :] == np.nanmax(Q_true[s, :])).flatten()
+    else:
+        a_opt  = np.argwhere(Q_true[s, a*4:a*4+4] == np.nanmax(Q_true[s, a*4:a*4+4])).flatten()
+                        
+    return a_opt
+
+def get_Q_true(world, state_arr):
+    
+    idcs = []
+    for ai in [0, 1]:
+        for aj in [0, 1]:
+            idcs.append(ai*4+aj)
+    for ai in [2, 3]:
+        for aj in [2, 3]:
+            ai_opp = get_a_opp(ai)
+            if aj == ai_opp:
+                idcs.append(ai*4+aj)
+                    
+    Q1_true = np.zeros((8,16))
+    Q2_true = np.zeros((8,4))
+    for s in range(8):
+        si = state2idcs(s, state_arr)
+        for a in range(4):
+            s1i, r = get_new_state(si, a, world, state_arr)
+            s1 = idcs2state(s1i, state_arr)
+            Q2_true[s, a] = r
+
+            for a2 in range(4):
+                s2i, r2 = get_new_state(s1i, a2, world, state_arr)
+                Q1_true[s, a*4+a2] = r + r2
+        Q1_true[:, idcs] = np.nan
+        
+    return Q1_true, Q2_true
+
 @jit(nopython=True)
-def replay_1move(Q2, T2, world, beta, alpha2, evm_thresh):
+def replay_1move(Q2, T2, world, Q_true, beta, alpha2, evm_thresh):
     R_vec  = world.flatten()
     # Generate replays from the model
     replay_exp = np.empty((32, 4))
@@ -57,7 +94,9 @@ def replay_1move(Q2, T2, world, beta, alpha2, evm_thresh):
             rr = np.sum(R_vec*this_action_probas)
             
             replay_exp[sr*4 +ar, :] = np.array([sr, ar, rr, s1r])
-                    
+    
+    tmp = np.zeros(2)
+    
     while True:
         # Gain & Need
         gain = compute_gain(Q2, replay_exp, alpha2, beta)
@@ -82,8 +121,30 @@ def replay_1move(Q2, T2, world, beta, alpha2, evm_thresh):
             delta = Q_target - Q2[sr, ar]
             Q2[sr, ar] = Q2[sr, ar] + alpha2 * delta
             
+            optimal = np.argwhere(Q_true[sr, :] == np.nanmax(Q_true[sr, :])).flatten()
+            # if ar in optimal:
+            #     tmp[0] += 1
+            # else:
+            #     tmp[1] += 1
+            is_scalar = len(optimal)
+            if is_scalar == 1:
+                if ar == optimal:
+                    tmp[0] += 1
+                else:
+                    tmp[1] += 1
+            else:
+                check = False
+                for aoi in range(0, len(optimal)):
+                    if ar == optimal[aoi]:
+                        check = True
+                if check == True:
+                    tmp[0] += 1
+                else:
+                    tmp[1] += 1
+                check = False
         else:
-            return Q2
+            ratio = tmp[0] - tmp[1]
+            return Q2, ratio
                     
 
 @jit(nopython=True)
