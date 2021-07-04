@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import shutil
-from misc import policy_choose, get_new_state, idcs2state, get_a_opp, normalise, replay_1move, replay_2moves, state2idcs, policy_choose_moves
+from misc import *
 
 class Agent:
     
@@ -10,14 +10,13 @@ class Agent:
         # ---- Agent parameters ----
         self.__dict__.update(**kwargs)
         
-        # World parameters – get rid of this later
         self.num_states  = 8
-        self.num_actions = 4 # as always
+        self.num_actions = 4 
         
         # Pre-initialise all learning neccessities
         # 1-move trials
         self.Q2 = np.random.normal(self.Q_init, 1, (8, 4)) # MF Q values for 1-move trials and second moves in 2-move trials
-        self.T2 = np.full((self.num_states, self.num_actions, self.num_states), 1/7, dtype=float) # state transition probability model 
+        self.T2 = np.full((self.num_states, self.num_actions, self.num_states), 1/7, dtype=float) # state transition model 
         for i in range(self.num_states):
             for j in range(self.num_actions):
                 self.T2[i, j, i] = 0 # Self-transitions are not allowed
@@ -29,10 +28,20 @@ class Agent:
         self.rew_history2 = []
         self.rew_history1 = []
                 
-        return
+        return None
     
-    def explore_one_move(self, world, state_arr, states, num_trials, online_learning=True, save_folder=None):
-        '''Run 1-move trials'''
+    def explore_one_move(self, world, state_idcs, states, num_trials, online_learning=True, save_folder=None):
+        '''
+        Run 1-move trials
+        
+        Parameters:
+        world           - reward function
+        state_idcs      – spatial arrangement of states
+        states          – starting state for each trial
+        num_trials      – number of trials to run
+        online_learning – True if feedback is provided
+        save_folder     – path for saving data
+        '''
         
         if save_folder is not None:
             if not os.path.isdir(save_folder):
@@ -43,7 +52,7 @@ class Agent:
             
         s_counter = 0
         s  = states[s_counter]
-        si = state2idcs(s, state_arr)
+        si = state2idcs(s, state_idcs)
         
         # Start exploring the maze
         for trial in range(num_trials):
@@ -54,16 +63,16 @@ class Agent:
             a      = np.random.choice(range(self.num_actions), p=probs)
             
             # Execute the action, move to the next state and receive reward
-            s1i, r = get_new_state(si, a, world, state_arr)
-            s1     = idcs2state(s1i, state_arr)
+            s1i, r = get_new_state(si, a, world, state_idcs)
+            s1     = idcs2state(s1i, state_idcs)
             
             # online TD-learning
             if online_learning:
                 self.rew_history2.append(r)
 
                 # Update Q values
-                Q_target = r        
-                delta    = Q_target - self.Q2[s, a]
+                Q_target      = r        
+                delta         = Q_target - self.Q2[s, a]
                 self.Q2[s, a] = self.Q2[s, a] + self.alpha2 * delta
             
                 # Update the state transition model
@@ -82,13 +91,12 @@ class Agent:
             replay = True # initialise replay 
             
             if replay:
-                Q2, replay_backups, Q_history, replay_gain = replay_1move(self.Q2, self.T2, world, self.beta, self.alpha2r, self.evm_thresh)
+                Q2, replay_backups, Q_history, replay_gain = replay_1move(self.Q2, self.T2, world, self.beta, self.alpha2r, self.xi)
                 self.Q2 = Q2
             
             if save_folder is not None:
                 save_name = os.path.join(save_folder, 'move%u'%trial)
-                np.savez(save_name, move=[s, a, r, s1], T=self.T2, 
-                         Q_history=Q_history, replay_backups=replay_backups, rew_history=self.rew_history2, replay_gain=replay_gain)
+                np.savez(save_name, move=[s, a, r, s1], T=self.T2, Q_history=Q_history, replay_backups=replay_backups, rew_history=self.rew_history2, replay_gain=replay_gain)
             
             if online_learning:
                 # Gradually forget the model towards average reward
@@ -101,17 +109,17 @@ class Agent:
             
                 # Normalise the transition matrix
                 self.T2 = normalise(self.T2)
-                                 
+                
             if trial == (num_trials-1):
                 break
                         
             # Complete this step – prepare next trial
             s_counter += 1
             s = states[s_counter]
-            si = state2idcs(s, state_arr)
+            si = state2idcs(s, state_idcs)
             
             
-    def explore_two_moves(self, world, state_arr, states, num_trials, online_learning=True, save_folder=None, T_forget=False):
+    def explore_two_moves(self, world, state_idcs, states, num_trials, online_learning=True, save_folder=None, T_forget=False):
         
         if save_folder is not None:
             if not os.path.isdir(save_folder):
@@ -137,7 +145,7 @@ class Agent:
 
         s_counter = 0
         s  = states[s_counter]
-        si = state2idcs(s, state_arr)
+        si = state2idcs(s, state_idcs)
         
         # Start exploring maze
         for _ in range(num_trials*2):
@@ -156,8 +164,8 @@ class Agent:
                 a      = np.random.choice(range(self.num_actions), p=probs)
                 
                 # Execute the action, move to the next state and receive reward
-                s1i, r = get_new_state(si, a, world, state_arr)
-                s1     = idcs2state(s1i, state_arr)
+                s1i, r = get_new_state(si, a, world, state_idcs)
+                s1     = idcs2state(s1i, state_idcs)
                 
                 prev_s  = s
                 prev_a  = a
@@ -193,8 +201,8 @@ class Agent:
                     a          = np.random.choice(range(self.num_actions), p=probs)
                     
                     # Execute the action, move to the next state and receive reward
-                    s1i, r = get_new_state(si, a, world, state_arr)
-                    s1     = idcs2state(s1i, state_arr)
+                    s1i, r = get_new_state(si, a, world, state_idcs)
+                    s1     = idcs2state(s1i, state_idcs)
                     
                     # Update both Q values
                     Q_target = r        
@@ -230,8 +238,8 @@ class Agent:
                     a          = np.random.choice(range(self.num_actions), p=probs)
 
                     # Execute the action, move to the next state and receive reward
-                    s1i, r = get_new_state(si, a, world, state_arr)
-                    s1     = idcs2state(s1i, state_arr)
+                    s1i, r = get_new_state(si, a, world, state_idcs)
+                    s1     = idcs2state(s1i, state_idcs)
                                     
             # Prepare replay
             replay = False # initialise counter
@@ -239,7 +247,7 @@ class Agent:
                 replay = True
                 
             if replay:
-                Q1, Q2, Q1_history, Q2_history, replay_backups, replay_gain1, replay_gain2 = replay_2moves(self.Q1, self.Q2, self.T2, world, self.evm_thresh, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
+                Q1, Q2, Q1_history, Q2_history, replay_backups, replay_gain1, replay_gain2 = replay_2moves(self.Q1, self.Q2, self.T2, world, self.xi, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
                 self.Q1 = Q1
                 self.Q2 = Q2
             
@@ -279,7 +287,7 @@ class Agent:
                         # self.Q1[:, idcs] = -100
 
                         self.T2 = self.rho * self.T2 + (1-self.rho) * 1/7
-                       
+                        
                         # Normalise the transition matrix
                         self.T2 = normalise(self.T2)
                             
@@ -291,10 +299,10 @@ class Agent:
                 
                 s_counter += 1
                 s = states[s_counter]
-                si = state2idcs(s, state_arr)
+                si = state2idcs(s, state_idcs)
                 
             else:
                 # Move agent to the next state    
-                s = s1
+                s  = s1
                 si = s1i
                             

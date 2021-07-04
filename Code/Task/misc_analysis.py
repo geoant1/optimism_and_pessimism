@@ -603,6 +603,8 @@ def get_replay_benefit(sub_task_folder, p, mode, ben):
     d     = -(a+b)
     biases = np.array([a, b, 0, d])
     
+    opt_sub = []
+    
     for i in range(0, 5):
         if i == 0:
             this_range = 6

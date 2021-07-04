@@ -2,7 +2,7 @@ import numpy as np
 import os, glob
 import scipy.stats
 import matplotlib.pyplot as plt
-from misc_analysis import get_optimal_move, get_entropy, get_joint_entropy, get_Q_true, histogram, permutation_test, policy_improve_2moves, policy_improve, get_obtained_reward, analyse_recent_replays, analyse_other_replays, get_replay_benefit
+from misc_analysis import *
 from plot import plot_performance, plot_replays_entropy, plot_replays, plot_policy
 
 root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/'
@@ -56,6 +56,8 @@ def analyse_task_performance(task_folder):
         
         fig = plot_performance(perf_agent[sub, :], perf_human[sub, :])
         plt.savefig(os.path.join(sub_task_folder, 'performance.png'))
+        np.save(os.path.join(sub_task_folder, 'performance_agent.npy'), perf_agent[sub, :])
+        np.save(os.path.join(sub_task_folder, 'performance_sub.npy'), perf_human[sub, :])
         plt.close()
         print('Done with sub %u'%sub)
     
@@ -65,6 +67,8 @@ def analyse_task_performance(task_folder):
         
     fig = plot_performance(perf_agent, perf_human, mode='all')
     plt.savefig(os.path.join(analysis_folder, 'overall_fit.svg'), format='svg', transparent=True)
+    np.save(os.path.join(analysis_folder, 'performance_agent_all.npy'), perf_agent)
+    np.save(os.path.join(analysis_folder, 'performance_sub_all.npy'), perf_human)
     plt.close()
     
 def analyse_replay_statistics(task_folder, thresh):
@@ -78,6 +82,7 @@ def analyse_replay_statistics(task_folder, thresh):
     subopt_all = []
 
     subs_who_replay = []
+    # subs_who_replay = np.load('/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Data/task/Analysis/subs_who_replay.npy')
 
     ### ---------------------------------------- ###
     ### Analyse the replay of recent transitions ###
@@ -127,6 +132,7 @@ def analyse_replay_statistics(task_folder, thresh):
             
             fig = plot_replays_entropy(opt, subopt, H_opt_single, H_subopt_single, H_opt_paired, H_subopt_paired)
             plt.savefig(os.path.join(sub_task_folder, 'recent_replays_entropy.svg'), format='svg', transparent=True)
+            np.savez(os.path.join(sub_task_folder, 'recent_replays_entropy_data.npz'), opt=opt, subopt=subopt, H_opt_single=H_opt_single, H_subopt_single=H_subopt_single, H_opt_paired=H_opt_paired, H_subopt_paired=H_subopt_paired)
             plt.close()
             
         print('Done with sub %u'%sub)
@@ -161,9 +167,12 @@ def analyse_replay_statistics(task_folder, thresh):
     # plot
     fig = plot_replays_entropy(opt_all, subopt_all, H_opt_single_all, H_subopt_single_all, H_opt_paired_all, H_subopt_paired_all)
     plt.savefig(os.path.join(analysis_folder, 'recent_replays_entropy.svg'), format='svg', transparent=True)
+    np.savez(os.path.join(analysis_folder, 'recent_replays_entropy_data.npz'), opt_all=opt_all, subopt_all=subopt_all, H_opt_single_all=H_opt_single_all, H_subopt_single_all=H_subopt_single_all, H_opt_paired_all=H_opt_paired_all, H_subopt_paired_all=H_subopt_paired_all)
     plt.close()
+    
     fig = plot_replays(opt_all, subopt_all)
     plt.savefig(os.path.join(analysis_folder, 'recent_replays.svg'), format='svg', transparent=True)
+    np.savez(os.path.join(analysis_folder, 'recent_replays_data.npz'), opt_all=opt_all, subopt_all=subopt_all)
     plt.close()
 
     print('\nDone with replay of recent transitions')
@@ -182,7 +191,8 @@ def analyse_replay_statistics(task_folder, thresh):
     opt_all    = []
     subopt_all = []
 
-    for sub in subs_who_replay:
+    # for sub in subs_who_replay:
+    for sub in folders:
         
         H_opt_single    = []
         H_opt_paired    = []
@@ -218,6 +228,7 @@ def analyse_replay_statistics(task_folder, thresh):
         
         fig = plot_replays_entropy(opt, subopt, H_opt_single, H_subopt_single, H_opt_paired, H_subopt_paired)
         plt.savefig(os.path.join(sub_task_folder, 'other_replays_entropy.svg'), format='svg', transparent=True)
+        np.savez(os.path.join(sub_task_folder, 'other_replays_entropy_data.npz'), opt=opt, subopt=subopt, H_opt_single=H_opt_single, H_subopt_single=H_subopt_single, H_opt_paired=H_opt_paired, H_subopt_paired=H_subopt_paired)
         plt.close()
         print('Done with sub %u'%sub)
     
@@ -235,10 +246,13 @@ def analyse_replay_statistics(task_folder, thresh):
     
     fig = plot_replays_entropy(opt_all, subopt_all, H_opt_single_all, H_subopt_single_all, H_opt_paired_all, H_subopt_paired_all)
     plt.savefig(os.path.join(analysis_folder, 'other_replays_entropy.svg'), format='svg', transparent=True)
+    np.savez(os.path.join(analysis_folder, 'other_replays_entropy_data.npz'), opt_all=opt_all, subopt_all=subopt_all, H_opt_single_all=H_opt_single_all, H_subopt_single_all=H_subopt_single_all, H_opt_paired_all=H_opt_paired_all, H_subopt_paired_all=H_subopt_paired_all)
+    
     plt.close()
     
     fig = plot_replays(opt_all, subopt_all)
     plt.savefig(os.path.join(analysis_folder, 'other_replays.svg'), format='svg', transparent=True)
+    np.savez(os.path.join(analysis_folder, 'other_replays_data.npz'), opt_all=opt_all, subopt_all=subopt_all)
     plt.close()
 
     stats_file = os.path.join(analysis_folder, 'stats_recent_vs_other.txt')
@@ -267,7 +281,7 @@ def analyse_replay_benefit(task_folder):
     ### ------------------------- ###
     
     analysis_folder = os.path.join(task_folder, 'Analysis')
-    subs_who_replay = np.load(os.path.join(root_path, 'Data/task/Analysis/subs_who_replay.npy'))
+    subs_who_replay = np.load(os.path.join(analysis_folder, 'subs_who_replay.npy'))
     print('Analysing benefit of replay...\n')
 
     modes   = ['value', 'probs', 'value']
@@ -288,12 +302,11 @@ def analyse_replay_benefit(task_folder):
             
             opt_sub = get_replay_benefit(sub_task_folder, p, modes[mode], ben)
             
-            
             opt_all.append(np.mean(opt_sub))
             
-            np.save(os.path.join(sub_task_folder, '%s_%s.npy'%(modes[mode], ben)), opt_sub)
             fig = plot_policy(opt_sub)
             plt.savefig(os.path.join(sub_task_folder, 'policy_improve_%s_%s.svg'%(modes[mode], ben)), format='svg', transparent=True)
+            np.save(os.path.join(sub_task_folder, 'policy_improve_%s_%s.npy'%(modes[mode], ben)), opt_sub)
             plt.close()
             
             stats_file = os.path.join(sub_task_folder, 'stats_policy_%s_%s.txt'%(modes[mode], ben))
@@ -301,12 +314,10 @@ def analyse_replay_benefit(task_folder):
                 f.write('Policy improvement \n')
                 f.write('\n Average: %.3f'%np.nanmean(opt_sub))
                 f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_sub, 0))
-                
-        
-        np.save(os.path.join(analysis_folder, '%s_%s.npy'%(modes[mode], ben)), opt_all)
         
         fig = plot_policy(opt_all)
         plt.savefig(os.path.join(analysis_folder, 'policy_improve_%s_%s.svg'%(modes[mode], ben)), format='svg', transparent=True)
+        np.save(os.path.join(analysis_folder, 'policy_improve_%s_%s.npy'%(modes[mode], ben)), opt_all)
         plt.close()
         
         stats_file = os.path.join(analysis_folder, 'stats_policy_%s_%s.txt'%(modes[mode], ben))
@@ -315,7 +326,7 @@ def analyse_replay_benefit(task_folder):
             f.write('\n Average: %.3f'%np.nanmean(opt_all))
             f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_all, 0))
             
-this_folder = os.path.join(root_path, 'Data/task')
-analyse_task_performance(this_folder)
+this_folder = os.path.join(root_path, 'Data/task_zeromf')
+# analyse_task_performance(this_folder)
 analyse_replay_statistics(this_folder, 0.5)
 analyse_replay_benefit(this_folder)
