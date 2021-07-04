@@ -68,18 +68,19 @@ class Agent:
             
             for i in range(3):
                 forget = False
-                learn  = True
                 if (i == 0):
-                    if (bl > 0):
-                        learn = False # no feedback in some first trials after block 0
-                    self.one_move(world, state_arr, states=these_states[i*18:i*18+6], online_learning=learn)
-                    self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+6+6], online_learning=learn)
-                    self.two_moves(world, state_arr, states=these_states[i*18+6+6:i*18+6+6+6])
+                    if bl == 0:
+                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6])
+                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18])
+                    else: # no feedback in first 12 trials after block 0
+                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6], online_learning=False)
+                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+12], online_learning=False)
+                        self.two_moves(world, state_arr, states=these_states[i*18+12:i*18+18])
                 else:
                     if ((bl == 1) or (bl == 3)) and (i == 2):
                         forget = True # do not forget at the end – special parameter in self.offtask_replay()
                     self.one_move(world, state_arr, states=these_states[i*18:i*18+6])
-                    self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+6+12], T_forget=forget)
+                    self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18], T_forget=forget)
             
             if (bl == 1):
                 self.offtask_replay()
