@@ -296,13 +296,8 @@ def policy_choose(q_values, temp, biases=None):
     
     return pol_vals/pol_vals.sum()
 
-def policy_choose_moves(Q, temp, biases):
+def policy_choose_moves(q_vals1, q_vals2, temp1, temp2, biases):
     '''Choose an action'''
-    q_vals1 = Q[0].copy()
-    temp1   = temp[0]
-    
-    q_vals2 = Q[1].copy()
-    temp2   = temp[1]
     
     num = q_vals1*temp1 + q_vals2*temp2 + biases
     
@@ -378,7 +373,7 @@ def compute_gain_first_move(Q_list: list, plan_exp, alpha:list, temp:list, biase
         q_vals2 = Q2[s, :].copy()
         
         # Policy before backup
-        probs_pre = policy_choose_moves([q_vals1, q_vals2], [beta1, beta2], biases)
+        probs_pre = policy_choose_moves(q_vals1, q_vals2, beta1, beta2, biases)
         a_taken   = a
         
         # Next state value
@@ -395,7 +390,7 @@ def compute_gain_first_move(Q_list: list, plan_exp, alpha:list, temp:list, biase
             probs   = policy_choose(tmp, beta1, biases)
             q_vals1_after = np.append(q_vals1_after, np.sum(tmp*probs))
             
-        probs_post = policy_choose_moves([q_vals1_after, q_vals2], [beta1, beta2], biases)
+        probs_post = policy_choose_moves(q_vals1_after, q_vals2, beta1, beta2, biases)
         
         # Calculate gain
         EV_pre = np.sum(probs_pre*q_vals1_after)
