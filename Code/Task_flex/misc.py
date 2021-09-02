@@ -136,9 +136,6 @@ def replay_2moves(Q1, Q2, T, world, xi, beta2, beta1, alpha2, alpha1):
     alpha2     – replay learning rate for Q2
     alpha1     – replay learning rate for Q1
     '''
-    
-    replay_type = 'off_policy'
-    
     replays2 = np.empty((32, 4), dtype=np.float64)
     for sr in range(8):
         for ar in range(4):
@@ -156,11 +153,9 @@ def replay_2moves(Q1, Q2, T, world, xi, beta2, beta1, alpha2, alpha1):
     # Generate 1st move experiences
     while True:
         replays1 = np.empty((8*16, 4), dtype=np.float64)  
-            
         for sr in range(8):
             for ar in range(4):
                 s1r = np.argmax(T[sr, ar, :])
-                
                 for ar2 in range(4):
                     rr = 0
                     for s2r in range(8):
@@ -298,13 +293,15 @@ def policy_choose(q_values, temp, biases=None):
     
     return pol_vals/pol_vals.sum()
 
-def policy_choose_moves(q_vals1, q_vals2, temp1, temp2, biases=None):
+def policy_choose_moves(Q, temp, biases):
     '''Choose an action'''
+    q_vals1 = Q[0].copy()
+    temp1   = temp[0]
     
-    if biases is not None:
-        num = q_vals1*temp1 + q_vals2*temp2 + biases
-    else:
-        num = q_vals1*temp1 + q_vals2*temp2
+    q_vals2 = Q[1].copy()
+    temp2   = temp[1]
+    
+    num = q_vals1*temp1 + q_vals2*temp2 + biases
     
     num = np.exp(num - np.nanmax(num))
     den = np.nansum(num)
@@ -351,7 +348,7 @@ def compute_gain(Q_table, plan_exp, alpha, temp):
             gain[i] = (EV_post - EV_pre)
     return gain
 
-def compute_gain_first_move(Q_list: list, plan_exp, alpha:list, temp:list, biases):
+def compute_gain_first_move(Q_list: list, plan_exp, alpha: list, temp: list, biases):
     '''Compute gain term for each experience'''
     Q1 = Q_list[0].copy()
     Q2 = Q_list[1].copy() 
@@ -378,7 +375,7 @@ def compute_gain_first_move(Q_list: list, plan_exp, alpha:list, temp:list, biase
         q_vals2 = Q2[s, :].copy()
         
         # Policy before backup
-        probs_pre = policy_choose_moves(q_vals1, q_vals2, beta1, beta2, biases)
+        probs_pre = policy_choose_moves([q_vals1, q_vals2], [beta1, beta2], biases)
         a_taken   = a
         
         # Next state value
@@ -395,7 +392,7 @@ def compute_gain_first_move(Q_list: list, plan_exp, alpha:list, temp:list, biase
             probs   = policy_choose(tmp, beta1, biases)
             q_vals1_after = np.append(q_vals1_after, np.sum(tmp*probs))
             
-        probs_post = policy_choose_moves(q_vals1_after, q_vals2, beta1, beta2, biases)
+        probs_post = policy_choose_moves([q_vals1_after, q_vals2], [beta1, beta2], biases)
         
         # Calculate gain
         EV_pre = np.sum(probs_pre*q_vals1_after)

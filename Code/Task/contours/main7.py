@@ -11,7 +11,7 @@ world1 = np.array([[0, 9, 3, 5],
 idcs1  = np.array([[0, 1, 2, 3], 
                    [4, 5, 6, 7]])
 
-root_path = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Code/Task/contours/'
+root_path      = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Code/Task/contours/'
 perf_save_path = os.path.join(root_path, 'perf_matrix')
 rat_save_path  = os.path.join(root_path, 'rat_matrix')
 

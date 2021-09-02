@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import os, glob
 import scipy.stats
 import matplotlib.pyplot as plt
@@ -102,7 +103,7 @@ def analyse_replay_statistics(task_folder, thresh):
         
         sub_task_folder = os.path.join(task_folder, str(sub))
         opt, subopt, H_opt_single, H_subopt_single, H_opt_paired, H_subopt_paired = analyse_recent_replays(sub_task_folder)
-                        
+        
         if np.nanmean(opt) > thresh or np.nanmean(subopt) > thresh:
 
             H_opt_single_all    += H_opt_single
@@ -191,8 +192,8 @@ def analyse_replay_statistics(task_folder, thresh):
     opt_all    = []
     subopt_all = []
 
-    # for sub in subs_who_replay:
-    for sub in folders:
+    for sub in subs_who_replay:
+    # for sub in folders:
         
         H_opt_single    = []
         H_opt_paired    = []
@@ -297,8 +298,9 @@ def analyse_replay_benefit(task_folder):
         for sub in subs_who_replay:
             
             sub_task_folder = os.path.join(task_folder, str(sub))
-            params = os.path.join(root_path, 'Data/fits/save_params_%u/params.npy'%sub)            
-            p      = np.load(params)
+            # params = os.path.join(root_path, 'Data/new_fits/save_params_%u/params.npy'%sub)
+            # p      = np.load(params)
+            p       = pd.read_csv(os.path.join(root_path, 'Data/new_new_fits/save_params_%u'%sub, 'backup.txt'), sep='\t').iloc[-1].values[:-2]
             
             opt_sub = get_replay_benefit(sub_task_folder, p, modes[mode], ben)
             
@@ -314,6 +316,7 @@ def analyse_replay_benefit(task_folder):
                 f.write('Policy improvement \n')
                 f.write('\n Average: %.3f'%np.nanmean(opt_sub))
                 f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_sub, 0))
+                # f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.wilcoxon(opt_sub))
         
         fig = plot_policy(opt_all)
         plt.savefig(os.path.join(analysis_folder, 'policy_improve_%s_%s.svg'%(modes[mode], ben)), format='svg', transparent=True)
@@ -325,8 +328,9 @@ def analyse_replay_benefit(task_folder):
             f.write('Policy improvement \n')
             f.write('\n Average: %.3f'%np.nanmean(opt_all))
             f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_all, 0))
+            # f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.wilcoxon(opt_all))
             
-this_folder = os.path.join(root_path, 'Data/task_zeromf')
-# analyse_task_performance(this_folder)
-analyse_replay_statistics(this_folder, 0.5)
+this_folder = os.path.join(root_path, 'Data/tmp')
+analyse_task_performance(this_folder)
+analyse_replay_statistics(this_folder, 0.3)
 analyse_replay_benefit(this_folder)

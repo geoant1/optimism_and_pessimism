@@ -1,6 +1,6 @@
 import numpy as np
-import os, shutil
-from misc import normalise, model_rearrange, state2idcs, idcs2state, get_new_state, get_a_opp, policy_choose, replay_2moves, replay_1move, policy_choose_moves
+from misc import normalise, model_rearrange, state2idcs, idcs2state, get_new_state, get_a_opp
+from misc_fit import policy_choose, replay_2moves, replay_1move, policy_choose_moves
 
 class Agent:
     
@@ -10,35 +10,23 @@ class Agent:
         self.__dict__.update(**kwargs)
     
         self.num_states  = 8
-        self.num_actions = 4 
+        self.num_actions = 4 # as always
         
         # Worlds
         self.world1 = np.array([[0, 9, 3, 5], [8, 2, 1, 10]], dtype=int)
-        self.idcs1  = np.array([[0, 1, 2, 3], [4, 5, 6, 7]],  dtype=int)
+        self.idcs1  = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=int)
         self.world2 = np.array([[3, 1, 0, 9], [5, 10, 8, 2]], dtype=int)
-        self.idcs2  = np.array([[5, 1, 2, 6], [4, 0, 3, 7]],  dtype=int)
+        self.idcs2  = np.array([[5, 1, 2, 6], [4, 0, 3, 7]], dtype=int)
         
         # Pre-initialise all learning neccessities
-        self.Q2 = np.random.normal(self.Q_init, 1, (self.num_states, self.num_actions)) # MF Q values for 1-move trials and second moves in 2-move trials
+        self.Q2 = np.random.normal(self.Q_init, 1, (8, 4)) # MF Q values for 1-move trials and second moves in 2-move trials
         self.T2 = np.full((self.num_states, self.num_actions, self.num_states), 1/7, dtype=float) # state transition probability model 
         for i in range(self.num_states):
             for j in range(self.num_actions):
                 self.T2[i, j, i] = 0 # Self-transitions are not allowed
         
         # 2-move trials
-        self.Q1 = np.random.normal(self.Q_init, 1, (self.num_states, self.num_actions*self.num_actions)) #  MF Q values for first moves in 2-move trials
-        
-        # back-tracking in 2-move trials is not allowed
-        idcs = []
-        for ai in [0, 1]:
-            for aj in [0, 1]:
-                idcs.append(ai*4+aj)
-        for ai in [2, 3]:
-            for aj in [2, 3]:
-                ai_opp = get_a_opp(ai)
-                if aj == ai_opp:
-                    idcs.append(ai*4+aj)
-        self.Q1[:, idcs] = np.nan
+        self.Q1 = np.random.normal(self.Q_init, 1, (8, 16)) #  MF Q values for first moves in 2-move trials
         
         # Buffers for rewards experienced by the agent
         self.rew_history2 = []
@@ -48,22 +36,18 @@ class Agent:
                 
         return None
     
-    def train(self, states, save_folder):
+    def train(self, states):
         
-        save_folder0 = os.path.join(save_folder, 'training')
-
         # Training
         world     = self.world1
         state_arr = self.idcs1
         for bl in range(7):
             these_states = states[bl]
-            
-            save_folder1 = os.path.join(save_folder0, str(bl))
-            self.one_move(world, state_arr, states=these_states, save_folder=save_folder1)
+            self.one_move(world, state_arr, states=these_states)
 
         return None
     
-    def task(self, states, save_folder):
+    def task(self, states):
         
         self.r_blocks = []
         # Task
@@ -71,8 +55,6 @@ class Agent:
             self.r_list  = []
             
             these_states = states[bl]
-            
-            save_folder0 = os.path.join(save_folder, str(bl))
             
             if bl in [0, 1]:
                 world     = self.world1
@@ -84,40 +66,32 @@ class Agent:
                 world     = self.world2
                 state_arr = self.idcs2
             
-            c = 0
             for i in range(3):
                 forget = False
                 if (i == 0):
                     if bl == 0:
-                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6], save_folder=os.path.join(save_folder0, str(c)))
-                        c += 1
-                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18], save_folder=os.path.join(save_folder0, str(c)))
-                        c += 1
+                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6])
+                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18])
                     else: # no feedback in first 12 trials after block 0
-                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6], online_learning=False, save_folder=os.path.join(save_folder0, str(c)))
-                        c += 1
-                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+12], online_learning=False, save_folder=os.path.join(save_folder0, str(c)))
-                        c += 1
-                        self.two_moves(world, state_arr, states=these_states[i*18+12:i*18+18], save_folder=os.path.join(save_folder0, str(c)))
-                        c += 1
+                        self.one_move(world, state_arr, states=these_states[i*18:i*18+6], online_learning=False)
+                        self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+12], online_learning=False)
+                        self.two_moves(world, state_arr, states=these_states[i*18+12:i*18+18])
                 else:
                     if ((bl == 1) or (bl == 3)) and (i == 2):
                         forget = True # do not forget at the end – special parameter in self.offtask_replay()
-                    self.one_move(world, state_arr, states=these_states[i*18:i*18+6], save_folder=os.path.join(save_folder0, str(c)))
-                    c += 1
-                    self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18], T_forget=forget, save_folder=os.path.join(save_folder0, str(c)))
-                    c += 1
+                    self.one_move(world, state_arr, states=these_states[i*18:i*18+6])
+                    self.two_moves(world, state_arr, states=these_states[i*18+6:i*18+18], T_forget=forget)
             
             if (bl == 1):
-                self.offtask_replay(save_folder=save_folder0)
+                self.offtask_replay()
             elif (bl == 3):
-                self.offtask_replay(rearrange=True, save_folder=save_folder0)
+                self.offtask_replay(rearrange=True)
             
             self.r_blocks += [self.r_list]
             
         return None
                 
-    def offtask_replay(self, rearrange=False, save_folder=None):
+    def offtask_replay(self, rearrange=False):
         
         av_rew2 = np.mean(self.rew_history2)
         av_rew1 = np.mean(self.rew_history1)
@@ -139,24 +113,13 @@ class Agent:
             self.T2  = self.rho * self.T2 + (1-self.rho) * 1/7 
             self.T2  = normalise(self.T2)
             
-        self.Q1, self.Q2, Q1_history, Q2_history, replay_backups, replay_gain1, replay_gain2 = replay_2moves(self.Q1.copy(), self.Q2.copy(), self.T2, self.world2, self.xi, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
-        
-        if save_folder is not None:
-            save_name = os.path.join(save_folder, 'offline.npz')
-            np.savez(save_name, T=self.T2, Q1_history=Q1_history, Q2_history=Q2_history, replay_backups=replay_backups, replay_gain1=replay_gain1, replay_gain2=replay_gain2, rew_history=[self.rew_history1, self.rew_history2])
+        self.Q1, self.Q2 = replay_2moves(self.Q1, self.Q2, self.T2, self.world2, self.xi, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
         
         return None
     
-    def one_move(self, world, state_arr, states, online_learning=True, save_folder=None):
+    def one_move(self, world, state_arr, states, online_learning=True):
         '''Run 1-move trials'''
         
-        if save_folder is not None:
-            if not os.path.isdir(save_folder):
-                os.makedirs(save_folder)
-            else:
-                shutil.rmtree(save_folder)
-                os.makedirs(save_folder)
-            
         num_trials = len(states)
             
         s_counter = 0
@@ -201,12 +164,8 @@ class Agent:
             # Prepare replay
             replay = True # initialise replay 
             if replay:
-                self.Q2, replay_backups, Q_history, replay_gain = replay_1move(self.Q2.copy(), self.T2, world, self.beta, self.alpha2r, self.xi)
+                self.Q2 = replay_1move(self.Q2.copy(), self.T2, world, self.beta, self.alpha2r, self.xi)
             
-            if save_folder is not None:
-                save_name = os.path.join(save_folder, 'move%u'%trial)
-                np.savez(save_name, move=[s, a, r, s1], T=self.T2, Q_history=Q_history, replay_backups=replay_backups, rew_history=self.rew_history2, replay_gain=replay_gain)
-                
             # Forget Q values
             if online_learning:
                 av_rew  = np.mean(self.rew_history2)
@@ -228,20 +187,24 @@ class Agent:
             si = state2idcs(s, state_arr)
             
             
-    def two_moves(self, world, state_arr, states, online_learning=True, T_forget=False, save_folder=None):
-        
-        if save_folder is not None:
-            if not os.path.isdir(save_folder):
-                os.makedirs(save_folder)
-            else:
-                shutil.rmtree(save_folder)
-                os.makedirs(save_folder)
-        
+    def two_moves(self, world, state_arr, states, online_learning=True, T_forget=False):
+                
         num_trials = len(states)
             
         num_steps    = 0
         num_episodes = 0
         sars         = np.empty((0, 4), dtype=int)
+        
+        idcs = []
+        for ai in [0, 1]:
+            for aj in [0, 1]:
+                idcs.append(ai*4+aj)
+        for ai in [2, 3]:
+            for aj in [2, 3]:
+                ai_opp = get_a_opp(ai)
+                if aj == ai_opp:
+                    idcs.append(ai*4+aj)
+        self.Q1[:, idcs] = np.nan
         
         s_counter = 0
         s = states[s_counter]
@@ -293,7 +256,6 @@ class Agent:
                 prev_s  = sars[-1, 0]
                 prev_a  = sars[-1, 1]
                 prev_r  = sars[-1, 2]
-                prev_s1 = sars[-1, 3]
                 
                 q_vals1 = self.Q1[prev_s, (prev_a*4):(prev_a*4+4)]
                 
@@ -353,7 +315,7 @@ class Agent:
                 replay = True
 
             if replay:
-                self.Q1, self.Q2, Q1_history, Q2_history, replay_backups, replay_gain1, replay_gain2 = replay_2moves(self.Q1, self.Q2, self.T2, world, self.xi, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
+                self.Q1, self.Q2 = replay_2moves(self.Q1.copy(), self.Q2.copy(), self.T2, world, self.xi, self.beta2, self.beta1, self.alpha2r, self.alpha1r)
             
             # Forget after first move
             if num_steps == 0 and online_learning:
@@ -375,12 +337,6 @@ class Agent:
             
             if num_steps == 2:
                 
-                if save_folder is not None:
-                    save_name = os.path.join(save_folder, 'move%u'%num_episodes)
-                    np.savez(save_name, move=[[prev_s, prev_a, prev_r, prev_s1], [s, a, r, s1]], T=self.T2, 
-                             Q1_history=Q1_history, Q2_history=Q2_history, replay_backups=replay_backups, replay_gain1=replay_gain1, replay_gain2=replay_gain2,
-                             rew_history=[self.rew_history1, self.rew_history2])
-                    
                 # Do not forget after certain blocks
                 if T_forget and num_episodes >= (num_trials-1):
                     pass

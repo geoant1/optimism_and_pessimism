@@ -93,8 +93,9 @@ def plot_replays_entropy(opt, subopt, H_opt_single, H_subopt_single, H_opt_paire
     plt.ylabel('Proportion of replays', fontsize=14)
     plt.xlabel('Action entropy', fontsize=14)
     
-    max_val = max(np.max(H_opt_hp), np.max(H_subopt_hs), np.max(H_opt_hs), np.max(H_subopt_hp))
-    plt.ylim(-max_val-0.1, max_val+0.1)
+    max_val = max(np.nanmax(H_opt_hp), np.nanmax(H_subopt_hs), np.nanmax(H_opt_hs), np.nanmax(H_subopt_hp))
+    if ~np.isnan(max_val):
+        plt.ylim(-max_val-0.1, max_val+0.1)
     
     plt.tight_layout()
     
