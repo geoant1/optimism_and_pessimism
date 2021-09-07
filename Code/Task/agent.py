@@ -109,8 +109,14 @@ class Agent:
                     c += 1
             
             if (bl == 1):
+                if self.ZERO_MF:
+                    self.Q1 *= 0
+                    self.Q2 *= 0
                 self.offtask_replay(save_folder=save_folder0)
             elif (bl == 3):
+                if self.ZERO_MF:
+                    self.Q1 *= 0
+                    self.Q2 *= 0
                 self.offtask_replay(rearrange=True, save_folder=save_folder0)
             
             self.r_blocks += [self.r_list]
@@ -377,7 +383,7 @@ class Agent:
                 
                 if save_folder is not None:
                     save_name = os.path.join(save_folder, 'move%u'%num_episodes)
-                    np.savez(save_name, move=[[prev_s, prev_a, prev_r, prev_s1], [s, a, r, s1]], T=self.T2, 
+                    np.savez(save_name, move=[[prev_s, prev_a, prev_r, prev_s1], [prev_s1, a, r, s1]], T=self.T2, 
                              Q1_history=Q1_history, Q2_history=Q2_history, replay_backups=replay_backups, replay_gain1=replay_gain1, replay_gain2=replay_gain2,
                              rew_history=[self.rew_history1, self.rew_history2])
                     

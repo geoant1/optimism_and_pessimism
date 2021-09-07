@@ -1,0 +1,26 @@
+                                 OLS Regression Results                                
+=======================================================================================
+Dep. Variable:                      y   R-squared (uncentered):                   0.862
+Model:                            OLS   Adj. R-squared (uncentered):              0.838
+Method:                 Least Squares   F-statistic:                              35.45
+Date:                Tue, 07 Sep 2021   Prob (F-statistic):                    1.55e-07
+Time:                        12:04:29   Log-Likelihood:                         -8.5618
+No. Observations:                  20   AIC:                                      23.12
+Df Residuals:                      17   BIC:                                      26.11
+Df Model:                           3                                                  
+Covariance Type:            nonrobust                                                  
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+8             -0.0461      0.104     -0.442      0.664      -0.266       0.174
+9              0.8208      0.107      7.667      0.000       0.595       1.047
+15             0.2346      0.093      2.529      0.022       0.039       0.430
+==============================================================================
+Omnibus:                        8.566   Durbin-Watson:                   2.209
+Prob(Omnibus):                  0.014   Jarque-Bera (JB):                6.041
+Skew:                          -1.014   Prob(JB):                       0.0488
+Kurtosis:                       4.770   Cond. No.                         1.84
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

@@ -88,7 +88,7 @@ def analyse_replay_statistics(task_folder, thresh):
     ### ---------------------------------------- ###
     ### Analyse the replay of recent transitions ###
     ### ---------------------------------------- ###
-    print('\nAnalysing the replay of recent transitions...\n')
+    print('\nAnalysing replay of recent transitions...\n')
     
     os.chdir(task_folder)
     s = glob.glob('*')
@@ -192,6 +192,8 @@ def analyse_replay_statistics(task_folder, thresh):
     opt_all    = []
     subopt_all = []
 
+    subs_who_replay = np.load(os.path.join('/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Data/tmp/Analysis', 'subs_who_replay.npy'))
+    
     for sub in subs_who_replay:
     # for sub in folders:
         
@@ -246,6 +248,7 @@ def analyse_replay_statistics(task_folder, thresh):
         f.write('opt vs subopt: W = %.3E, p = %.3E\n'%(t, p))
     
     fig = plot_replays_entropy(opt_all, subopt_all, H_opt_single_all, H_subopt_single_all, H_opt_paired_all, H_subopt_paired_all)
+    plt.ylim(-0.5, 0.5)
     plt.savefig(os.path.join(analysis_folder, 'other_replays_entropy.svg'), format='svg', transparent=True)
     np.savez(os.path.join(analysis_folder, 'other_replays_entropy_data.npz'), opt_all=opt_all, subopt_all=subopt_all, H_opt_single_all=H_opt_single_all, H_subopt_single_all=H_subopt_single_all, H_opt_paired_all=H_opt_paired_all, H_subopt_paired_all=H_subopt_paired_all)
     
@@ -282,7 +285,8 @@ def analyse_replay_benefit(task_folder):
     ### ------------------------- ###
     
     analysis_folder = os.path.join(task_folder, 'Analysis')
-    subs_who_replay = np.load(os.path.join(analysis_folder, 'subs_who_replay.npy'))
+    subs_who_replay = np.load(os.path.join('/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Data/tmp/Analysis', 'subs_who_replay.npy'))
+    # subs_who_replay = np.load(os.path.join(analysis_folder, 'subs_who_replay.npy'))
     print('Analysing benefit of replay...\n')
 
     modes   = ['value', 'probs', 'value']
@@ -330,7 +334,7 @@ def analyse_replay_benefit(task_folder):
             f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.ttest_1samp(opt_all, 0))
             # f.write('Opt policy change: t: %.3f,  p-value: %.3E' % scipy.stats.wilcoxon(opt_all))
             
-this_folder = os.path.join(root_path, 'Data/tmp')
-analyse_task_performance(this_folder)
+this_folder = os.path.join(root_path, 'Data/tmp_zeromf')
+# analyse_task_performance(this_folder)
 analyse_replay_statistics(this_folder, 0.3)
 analyse_replay_benefit(this_folder)

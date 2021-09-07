@@ -7,7 +7,7 @@ from multiprocessing import Pool
 data_path      = '/Users/GA/Documents/Dayan_lab/Optimism_And_Pessimism_In_Optimised_Replay/Data'
 
 # load data
-this_sub       = 39 # subject number 26, 25, 17, 11, 10, 
+this_sub       = 25 # subject number 26, 25, 17, 11, 10, 
 sub_data_path  = os.path.join(data_path, 'subject_data', str(this_sub)) # path to subject data
 
 blocks_max_rwd = np.load(os.path.join(sub_data_path, 'blocks_max_rwd.npy'), allow_pickle=True)[7:] # max possible reward for this subject
@@ -25,7 +25,7 @@ out_file       = os.path.join(save_folder, 'backup.txt')
 # fitting necessities
 num_av = 5  # number of simulations run with each parameter
 eps    = np.logspace(np.log10(0.6), np.log10(0.10), 55) # tolerance threshold for each ABC iteration
-sigma  = np.logspace(np.log10(0.5), np.log10(0.01), 55) # perturbation variance for each ABC iteration
+sigma  = np.logspace(np.log10(0.5), np.log10(0.02), 55) # perturbation variance for each ABC iteration
 
 # function that simulates data
 def main(params):

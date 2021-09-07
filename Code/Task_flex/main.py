@@ -28,7 +28,8 @@ def main(params):
 
 if __name__ == '__main__':
     # 8, 18, 39
-    for this_sub in range(2, num_subs):
+    # for this_sub in np.delete(range(num_subs), [0, 1, 2, 5, 6, 9, 10, 11, 12, 13, 15, 16, 17, 25, 26, 27, 36, 39]):
+    for this_sub in [25]:
         
         # load data
         sub_data_path = os.path.join(data_path, str(this_sub)) # path to subject data

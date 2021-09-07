@@ -1,0 +1,1 @@
+Ranksums : MF phi vs MI phi   : t = 3.084E+00, p = 2.044E-03

@@ -347,7 +347,7 @@ class Agent:
                     s1i, r   = get_new_state(si, a, world, state_arr)
                     s1       = idcs2state(s1i, state_arr)
                 
-                moves += [[[prev_s, prev_a, prev_r, prev_s1], [s, a, r, s1]]]
+                moves += [[[prev_s, prev_a, prev_r, prev_s1], [prev_s1, a, r, s1]]]
                 
                 self.r_list.append(prev_r+r)
                 

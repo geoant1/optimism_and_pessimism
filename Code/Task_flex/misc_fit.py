@@ -165,13 +165,10 @@ def replay_2moves(Q1, Q2, T2, world, xi, beta2, beta1, alpha2, alpha1):
                     rr = 0
                     for s2r in range(8):
                         
-                        q_vals2 = Q2[s2r, :]
-                        probs  = policy_choose(q_vals2, beta2)
-                        
                         these_action_probas     = T2[s2r, ar2, :].copy()
                         these_action_probas[sr] = 0
-                        these_action_probas = these_action_probas / np.sum(these_action_probas)                      
-                        rr += T2[sr, ar, s2r]*(world.ravel()[s2r] + probs[ar2]*np.sum(these_action_probas * world.ravel()))
+                        these_action_probas     = these_action_probas / np.sum(these_action_probas)
+                        rr += T2[sr, ar, s2r]*(world.ravel()[s2r] + np.sum(these_action_probas * world.ravel()))
                         
                     replay_exp1[sr*16 + (ar*4 +ar2), :] = np.array([sr, ar*4+ar2, rr, s1r*8+s2r], dtype=np.float64)
                     

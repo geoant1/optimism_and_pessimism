@@ -163,7 +163,7 @@ def policy_improve_2moves(q1_before, q1_after, q2_before, q2_after, Q1_true, Q2_
     
     return out
 
-def histogram(arr, bins=None):
+def histogram(arr, bins=None, normalise=True):
 
     arr  = np.array(arr)
     # arr  = arr[~np.isnan(arr)]
@@ -174,7 +174,10 @@ def histogram(arr, bins=None):
             h, b = np.histogram(arr, bins=range(0,int(np.max(arr)+2)))
         except:
             h, b = np.histogram(arr)
-    h    = h/np.sum(h)
+    if normalise:
+        h    = h/np.sum(h)
+    else: pass
+    
     w    = b[1] - b[0]
     
     return h, b[:-1], w
@@ -325,7 +328,7 @@ def analyse_recent_replays(sub_task_folder):
                     s1 = move[0][0]
                     a1 = move[0][1]
 
-                    s2 = move[1][0]
+                    s2 = move[0][3]
                     a2 = move[1][1]
 
                     a  = a1*4 + a2
@@ -489,10 +492,10 @@ def analyse_recent_replays(sub_task_folder):
                             if num_replays_similar > 0:
                                 H_subopt_single += [get_entropy(T, s2, ja2[1])]*num_replays_similar
                     
-                if single_move_optimal:
-                    opt += [tmp_opt]
-                else:
-                    subopt += [tmp_subopt]
+                    if single_move_optimal:
+                        opt += [tmp_opt]
+                    else:
+                        subopt += [tmp_subopt]
                                     
     return opt, subopt, H_opt_single, H_subopt_single, H_opt_paired, H_subopt_paired
 
@@ -544,7 +547,7 @@ def analyse_other_replays(sub_task_folder):
                         s1 = move[0][0]
                         a1 = move[0][1]
 
-                        s2 = move[1][0]
+                        s2 = move[0][3]
                         a2 = move[1][1]
 
                         # Ditto
@@ -617,8 +620,8 @@ def analyse_other_replays(sub_task_folder):
                                             H_subopt_single += [get_entropy(T, sr, ar)]
                                             tmp_subopt += 1
 
-                    opt    += [tmp_opt]
-                    subopt += [tmp_subopt]
+                opt    += [tmp_opt]
+                subopt += [tmp_subopt]
     
     return opt, subopt, H_opt_single, H_subopt_single, H_opt_paired, H_subopt_paired
 

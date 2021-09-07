@@ -1,0 +1,2 @@
+File `sub_meta.npy` contains 40 entries for each subject.
+0 = MF subject; 1 = MI subject; 2 = MI subject who hurt himself
