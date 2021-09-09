@@ -1,25 +1,27 @@
                                  OLS Regression Results                                
 =======================================================================================
-Dep. Variable:                      y   R-squared (uncentered):                   0.862
-Model:                            OLS   Adj. R-squared (uncentered):              0.838
-Method:                 Least Squares   F-statistic:                              35.45
-Date:                Tue, 07 Sep 2021   Prob (F-statistic):                    1.55e-07
-Time:                        12:04:29   Log-Likelihood:                         -8.5618
-No. Observations:                  20   AIC:                                      23.12
-Df Residuals:                      17   BIC:                                      26.11
-Df Model:                           3                                                  
+Dep. Variable:                      y   R-squared (uncentered):                   0.910
+Model:                            OLS   Adj. R-squared (uncentered):              0.880
+Method:                 Least Squares   F-statistic:                              30.20
+Date:                Wed, 08 Sep 2021   Prob (F-statistic):                    2.54e-07
+Time:                        10:48:32   Log-Likelihood:                         -4.3393
+No. Observations:                  20   AIC:                                      18.68
+Df Residuals:                      15   BIC:                                      23.66
+Df Model:                           5                                                  
 Covariance Type:            nonrobust                                                  
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-8             -0.0461      0.104     -0.442      0.664      -0.266       0.174
-9              0.8208      0.107      7.667      0.000       0.595       1.047
-15             0.2346      0.093      2.529      0.022       0.039       0.430
+0             -0.1599      0.081     -1.983      0.066      -0.332       0.012
+1              0.1565      0.080      1.967      0.068      -0.013       0.326
+3              0.0276      0.135      0.205      0.841      -0.260       0.315
+9              0.8105      0.087      9.331      0.000       0.625       0.996
+15             0.2424      0.130      1.860      0.083      -0.035       0.520
 ==============================================================================
-Omnibus:                        8.566   Durbin-Watson:                   2.209
-Prob(Omnibus):                  0.014   Jarque-Bera (JB):                6.041
-Skew:                          -1.014   Prob(JB):                       0.0488
-Kurtosis:                       4.770   Cond. No.                         1.84
+Omnibus:                        0.559   Durbin-Watson:                   2.046
+Prob(Omnibus):                  0.756   Jarque-Bera (JB):                0.300
+Skew:                          -0.287   Prob(JB):                        0.861
+Kurtosis:                       2.826   Cond. No.                         3.25
 ==============================================================================
 
 Warnings:

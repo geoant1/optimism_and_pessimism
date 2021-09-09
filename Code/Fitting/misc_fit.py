@@ -5,23 +5,23 @@ from numba import jit
 def sample_prior():
     
     p = [np.random.gamma(1, 1),
-         np.random.gamma(1, 1),
-         np.random.gamma(1, 1),
-         np.random.uniform(0, 1),
-         np.random.uniform(0, 1),
-         np.random.normal(0, 1),
-         np.random.beta(6, 2),
-         np.random.beta(6, 2),
-         np.random.beta(6, 2),
-         np.random.beta(6, 2),
-         np.random.normal(0, 1),
-         np.random.normal(0, 1),
-         np.random.uniform(0, 1),
-         np.random.uniform(0, 1),
-         np.random.uniform(0, 1),
-         scipy.stats.loggamma.rvs(0.02, loc=-1, scale=1/100, size=1)[0],
-         np.random.uniform(0, 1),
-         np.random.uniform(0, 1)]
+        np.random.gamma(1, 1),
+        np.random.gamma(1, 1),
+        np.random.uniform(0, 1),
+        np.random.uniform(0, 1),
+        np.random.normal(0, 1),
+        np.random.beta(6, 2),
+        np.random.beta(6, 2),
+        np.random.beta(6, 2),
+        np.random.beta(6, 2),
+        np.random.normal(0, 1),
+        np.random.normal(0, 1),
+        np.random.uniform(0, 1),
+        np.random.uniform(0, 1),
+        np.random.uniform(0, 1),
+        scipy.stats.loggamma.rvs(0.02, loc=-1, scale=1/100, size=1)[0],
+        np.random.uniform(0, 1),
+        np.random.uniform(0, 1)]
     
     return p
 
