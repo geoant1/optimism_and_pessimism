@@ -1,9 +1,0 @@
-Action entropy tests 
-H_opt_paired recent vs H_opt_paired other:       W = -2.665E+01, p = 1.837E-156
-H_opt_single recent vs H_opt_single other:       W = -1.680E+01, p = 2.378E-63
-H_subopt_paired recent vs H_subopt_paired other: W = -5.062E+01, p = 0.000E+00
-H_subopt_single recent vs H_subopt_single other: W = -2.020E+01, p = 1.064E-90
-
-Replay tests 
-subopt recent vs subopt other: W = -4.877E+00, p = 1.075E-06
-opt recent vs opt other:       W = -4.695E+00, p = 2.669E-06

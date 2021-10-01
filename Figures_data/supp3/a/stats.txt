@@ -1,2 +1,2 @@
-Regression: R^2 = 7.968E-01, p = 1.015E-14
-MF vs MI: t = -2.327E-01, p = 7.000E-05
+Regression: R^2 = 7.279E-01, p = 2.717E-12
+MF vs MI: t = -2.231E-01, p = 0.000E+00

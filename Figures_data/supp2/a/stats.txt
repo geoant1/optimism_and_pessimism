@@ -1,1 +1,1 @@
-phi ours vs Eran's:      t = 6.552E+00, p = 5.537E-09
+phi ours vs Eran's:      t = 6.737E+00, p = 2.486E-09

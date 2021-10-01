@@ -1,6 +1,6 @@
 Action entropy tests 
-H_opt_paired other vs H_subopt_paired other: W = -1.602E+01, p = 8.739E-58
-H_opt_single other vs H_subopt_single other: W = -2.842E+01, p = 1.015E-177
+H_opt_paired other vs H_subopt_paired other: W = -4.584E+00, p = 4.560E-06
+H_opt_single other vs H_subopt_single other: W = 7.434E+00, p = 1.052E-13
 
 Replay tests 
-opt vs subopt: W = -1.651E+01, p = 2.933E-61
+opt vs subopt: W = -2.111E+00, p = 3.477E-02
