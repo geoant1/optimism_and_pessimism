@@ -1,6 +1,0 @@
-H_opt_paired_exp vs H_opt_paired:       t = -3.361E+00, p = 7.765E-04
-H_opt_single_exp vs H_opt_single:       t = -9.254E+00, p = 2.171E-20
-H_subopt_paired_exp vs H_subopt_paired: t = -8.468E+00, p = 2.487E-17
-H_subopt_single_exp vs H_subopt_single: t = -1.472E+01, p = 4.620E-49
-subopt_all_exp vs subopt_all: t = -1.261E+01, p = 1.916E-36
-opt_all_exp vs opt_all:       t = -1.948E+01, p = 1.553E-84
