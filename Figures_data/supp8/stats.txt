@@ -1,1 +1,1 @@
-ent MI vs ent MF: t = -2.563E+00, p = 1.446E-02
+ent MI vs ent MF: t = -2.644E+00, p = 1.185E-02
